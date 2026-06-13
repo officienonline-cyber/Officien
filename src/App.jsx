@@ -195,10 +195,7 @@ function App() {
           <Footer />
         </>
       ) : showAllProjects ? (
-        <>
-          <ProjectsPage onBack={handleBackFromAllProjects} />
-          <Footer />
-        </>
+        <ProjectsPage onBack={handleBackFromAllProjects} />
       ) : (
         <main id="main-content" className="relative z-10">
           <Hero />

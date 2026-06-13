@@ -1,9 +1,8 @@
 import React, { useRef, useEffect, useState } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
 
 /* ─────────────────────────────────────────────
-   PROJECT DATA (4 Total Projects)
+   PROJECT DATA (3 Projects Total)
 ───────────────────────────────────────────── */
 const PROJECT_DATA = [
   {
@@ -51,21 +50,6 @@ const PROJECT_DATA = [
         "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055818_9d062121-ad7e-46b9-999a-1a6a692ef1ee.png&w=1280&q=85",
     },
   },
-  {
-    id: "04",
-    number: "04",
-    name: "NovaPay Dashboard",
-    category: "Fintech UI",
-    type: "Client",
-    images: {
-      col1Top:
-        "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80",
-      col1Bottom:
-        "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=600&q=80",
-      col2:
-        "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=800&q=80",
-    },
-  },
 ];
 
 /* ─────────────────────────────────────────────
@@ -75,177 +59,159 @@ const LiveProjectButton = ({ projectName }) => (
   <a
     href="#contact"
     aria-label={`View live project: ${projectName}`}
-    className="group flex-shrink-0 flex items-center gap-2 px-3 py-2 sm:px-4 sm:py-2.5 rounded-full border border-[#D7E2EA]/40 bg-[#D7E2EA]/5 hover:bg-[#D7E2EA]/15 hover:border-[#D7E2EA]/80 transition-all duration-300 hover:shadow-[0_0_20px_rgba(215,226,234,0.2)] font-sans"
+    className="px-6 py-2 sm:px-8 sm:py-2.5 text-xs sm:text-sm border-2 border-[#D7E2EA] text-[#D7E2EA] font-medium rounded-full uppercase tracking-widest hover:bg-[#D7E2EA]/10 transition-all duration-300 whitespace-nowrap font-sans"
   >
-    <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-widest text-[#D7E2EA]/70 group-hover:text-[#D7E2EA] transition-colors whitespace-nowrap hidden sm:inline">
-      Live Project
-    </span>
-    <ArrowUpRight
-      size={14}
-      className="text-[#D7E2EA]/70 group-hover:text-[#D7E2EA] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all duration-300"
-    />
+    Live Project
   </a>
 );
 
 /* ─────────────────────────────────────────────
    SINGLE PROJECT CARD
 ───────────────────────────────────────────── */
-const ProjectCard = React.memo(({ project, index, totalCards, scrollYProgress, prefersReducedMotion }) => {
+const ProjectCard = React.memo(({ project, index, smoothProgress, prefersReducedMotion }) => {
+  const totalCards = PROJECT_DATA.length;
   const targetScale = 1 - (totalCards - 1 - index) * 0.03;
 
-  // Scale down when the subsequent cards are scrolling up to overlap this card.
-  // Card 0 scales from 0.0 to 0.25
-  // Card 1 scales from 0.25 to 0.50
-  // Card 2 scales from 0.50 to 0.75
-  // Card 3 does not scale down (stays at 1.0)
-  const startRange = (index / totalCards) * 0.8;
-  const endRange = ((index + 1) / totalCards) * 0.8;
+  const yVal = useTransform(
+    smoothProgress,
+    index === 0
+      ? [0, 1]
+      : index === 1
+      ? [0.08, 0.35]
+      : [0.35, 0.6],
+    index === 0
+      ? [0, 0]
+      : index === 1
+      ? [800, 18]
+      : [800, 36]
+  );
 
-  const scaleValue = useTransform(scrollYProgress, [startRange, endRange], [1, targetScale]);
-  
-  const scale = useSpring(scaleValue, {
-    stiffness: 90,
-    damping: 24,
-    mass: 0.6,
-  });
+  const scaleVal = useTransform(
+    smoothProgress,
+    index === 0
+      ? [0.1, 0.35]
+      : index === 1
+      ? [0.37, 0.6]
+      : [0, 1],
+    index === 0
+      ? [1, targetScale]
+      : index === 1
+      ? [1, targetScale]
+      : [1, 1]
+  );
 
-  const shadowOpacity = useTransform(scrollYProgress, [startRange, endRange], [0.15, 0.45]);
-  const imageParallaxY = useTransform(scrollYProgress, [startRange, endRange], [0, -30]);
+  const shadowOpacityVal = useTransform(
+    smoothProgress,
+    index === 0
+      ? [0.1, 0.35]
+      : index === 1
+      ? [0.37, 0.6]
+      : [0, 1],
+    [0.15, 0.45]
+  );
 
-  const [topOffset, setTopOffset] = useState(210);
-  const [cardGap, setCardGap] = useState(24);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 640) {
-        setTopOffset(130);
-        setCardGap(16);
-      } else if (window.innerWidth < 1024) {
-        setTopOffset(175);
-        setCardGap(20);
-      } else {
-        setTopOffset(220);
-        setCardGap(24);
-      }
-    };
-    handleResize();
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  const stickyTop = `${topOffset + index * cardGap}px`;
-  const finalScale = prefersReducedMotion ? 1 : (index === totalCards - 1 ? 1 : scale);
+  const finalY = prefersReducedMotion ? (index === 0 ? 0 : index === 1 ? 18 : 36) : yVal;
+  const finalScale = prefersReducedMotion ? 1 : scaleVal;
 
   return (
     <motion.article
       id={`project-card-${project.id}`}
       aria-label={`Project ${project.number}: ${project.name}`}
       style={{
-        position: "sticky",
-        top: stickyTop,
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        y: finalY,
         scale: finalScale,
         zIndex: index + 1,
         willChange: "transform",
         transformOrigin: "center top",
-        boxShadow: `0 24px 80px rgba(0,0,0,${prefersReducedMotion ? 0.25 : shadowOpacity})`,
+        boxShadow: `0 24px 80px rgba(0,0,0,${prefersReducedMotion ? 0.25 : shadowOpacityVal})`,
       }}
       whileHover={
         prefersReducedMotion
           ? {}
           : {
-              scale: index === totalCards - 1 ? 1.01 : undefined,
-              boxShadow: "0 0 32px rgba(215,226,234,0.18), 0 24px 80px rgba(0,0,0,0.5)",
+              boxShadow: "0 0 32px rgba(215, 226, 234, 0.18), 0 24px 80px rgba(0,0,0,0.5)",
             }
       }
       className="
-        border border-[#D7E2EA]/30 hover:border-[#D7E2EA]/60
+        border-2 border-[#D7E2EA]
         bg-[#0C0C0C]
-        rounded-[30px] sm:rounded-[40px] md:rounded-[50px]
-        p-4 sm:p-6 md:p-8
+        rounded-[40px] sm:rounded-[50px] md:rounded-[60px]
+        p-4 sm:p-5 md:p-6
         overflow-hidden
         transition-[border-color] duration-300
         group
         w-full
-        h-[68vh] sm:h-[72vh]
+        h-[60vh] sm:h-[63vh] md:h-[66vh]
         flex flex-col justify-between
-        mb-12 sm:mb-16 md:mb-20
       "
     >
       {/* ── TOP ROW ── */}
-      <div className="flex items-start justify-between mb-4 sm:mb-6 md:mb-8 font-sans">
+      <div className="flex items-start justify-between mb-3 sm:mb-4 md:mb-5 font-sans">
+        {/* Number */}
         <div
-          aria-hidden="true"
           className="
-            font-black leading-none select-none
-            text-[clamp(2.2rem,7vw,110px)]
-            text-[#D7E2EA]/8
-            tracking-tighter
-            flex-shrink-0
+            text-[clamp(2.5rem,8vw,110px)] font-black text-transparent select-none leading-none
           "
+          style={{ WebkitTextStroke: "1px rgba(215, 226, 234, 0.15)" }}
         >
           {project.number}
         </div>
 
-        <div className="flex-1 mx-3 sm:mx-5 md:mx-7 pt-1">
-          <div className="flex items-center gap-2 mb-1 sm:mb-2">
-            <span className="text-[9px] sm:text-[10px] md:text-xs font-semibold uppercase tracking-[0.2em] text-[#D7E2EA]/50">
-              {project.category}
-            </span>
-            <span className="w-1 h-1 rounded-full bg-[#D7E2EA]/25 flex-shrink-0" />
-            <span
-              className={`text-[9px] sm:text-[10px] md:text-xs font-medium uppercase tracking-widest px-2 py-0.5 rounded-full border ${
-                project.type === "Client"
-                  ? "border-[#D7E2EA]/20 text-[#D7E2EA]/40"
-                  : "border-[#6366F1]/30 text-[#6366F1]/70"
-              }`}
-            >
-              {project.type}
-            </span>
-          </div>
-          <h3 className="font-black uppercase tracking-tight text-[#D7E2EA] leading-none text-lg sm:text-2xl md:text-3xl lg:text-4xl">
+        {/* Project Info */}
+        <div className="flex-1 mx-4 sm:mx-6 md:mx-8 pt-2">
+          <span className="text-xs sm:text-sm md:text-base text-[#D7E2EA] uppercase tracking-widest font-medium">
+            {project.category}
+          </span>
+          <h3 className="text-xl sm:text-2xl md:text-3xl font-black text-[#D7E2EA] uppercase tracking-tight mt-1">
             {project.name}
           </h3>
         </div>
 
+        {/* Live Project Button */}
         <LiveProjectButton projectName={project.name} />
       </div>
 
-      {/* ── IMAGE GRID ── */}
-      <div className="grid grid-cols-2 gap-2 sm:gap-3 md:gap-4 overflow-hidden flex-1 items-stretch">
-        <div className="flex flex-col gap-2 sm:gap-3 justify-between">
-          <motion.div
-            className="overflow-hidden rounded-[18px] sm:rounded-[28px] md:rounded-[36px] flex-1 relative bg-white/[0.03]"
+      {/* ── BOTTOM ROW (Image Grid) ── */}
+      <div className="grid grid-cols-10 gap-3 sm:gap-4 md:gap-5 flex-1 items-stretch min-h-0">
+        {/* Left Column - 40% width (col-span-4) */}
+        <div className="col-span-4 flex flex-col gap-2 sm:gap-3 justify-between h-full">
+          <div
+            className="overflow-hidden rounded-[40px] sm:rounded-[50px] md:rounded-[60px] relative flex-1"
+            style={{ maxHeight: "46%" }}
           >
-            <motion.img
+            <img
               src={project.images.col1Top}
               alt={`${project.name} screenshot 1`}
               loading="lazy"
-              style={{ y: prefersReducedMotion ? 0 : imageParallaxY }}
               className="w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-700 absolute inset-0"
             />
-          </motion.div>
+          </div>
 
           <div
-            className="overflow-hidden rounded-[18px] sm:rounded-[28px] md:rounded-[36px] flex-1 relative bg-white/[0.03]"
+            className="overflow-hidden rounded-[40px] sm:rounded-[50px] md:rounded-[60px] relative flex-1"
+            style={{ maxHeight: "48%" }}
           >
-            <motion.img
+            <img
               src={project.images.col1Bottom}
               alt={`${project.name} screenshot 2`}
               loading="lazy"
-              style={{ y: prefersReducedMotion ? 0 : imageParallaxY }}
               className="w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-700 delay-75 absolute inset-0"
             />
           </div>
         </div>
 
+        {/* Right Column - 60% width (col-span-6) */}
         <div
-          className="overflow-hidden rounded-[18px] sm:rounded-[28px] md:rounded-[36px] relative col-span-1 bg-white/[0.03]"
+          className="col-span-6 overflow-hidden rounded-[40px] sm:rounded-[50px] md:rounded-[60px] relative h-full"
         >
-          <motion.img
+          <img
             src={project.images.col2}
             alt={`${project.name} hero image`}
             loading="lazy"
-            style={{ y: prefersReducedMotion ? 0 : imageParallaxY }}
             className="w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-700 delay-150 absolute inset-0"
           />
         </div>
@@ -257,41 +223,22 @@ const ProjectCard = React.memo(({ project, index, totalCards, scrollYProgress, p
 ProjectCard.displayName = "ProjectCard";
 
 /* ─────────────────────────────────────────────
-   SCROLL PROGRESS BAR
-───────────────────────────────────────────── */
-const ScrollProgressBar = ({ scrollYProgress }) => {
-  const scaleX = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
-
-  return (
-    <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#D7E2EA]/10 z-20 overflow-hidden rounded-full">
-      <motion.div
-        className="h-full origin-left"
-        style={{
-          scaleX,
-          background: "linear-gradient(90deg, #D7E2EA 0%, #6366F1 60%, #A78BFA 100%)",
-        }}
-      />
-    </div>
-  );
-};
-
-/* ─────────────────────────────────────────────
    MAIN SECTION
-───────────────────────────────────────────── */
+ ───────────────────────────────────────────── */
 export const Projects = ({ onViewAllClick }) => {
   const sectionRef = useRef(null);
-  const containerRef = useRef(null);
 
-  // Section-level scroll progress for the progress bar
-  const { scrollYProgress: sectionProgress } = useScroll({
+  // Track scroll progress of the entire scroll track
+  const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start start", "end end"],
   });
 
-  // Container-level scroll progress for card stacking scale adjustments
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ["start start", "end end"],
+  // Spring to smooth out timeline transitions
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 75,
+    damping: 22,
+    mass: 0.5,
   });
 
   // Prefers-reduced-motion check
@@ -304,6 +251,14 @@ export const Projects = ({ onViewAllClick }) => {
     return () => mq.removeEventListener("change", handler);
   }, []);
 
+  // Button animation based on smoothProgress (starts fading in after Card 3 starts appearing, i.e., > 0.5)
+  const buttonOpacity = useTransform(smoothProgress, [0.5, 0.65], [0, 1]);
+  const buttonScale = useTransform(smoothProgress, [0.5, 0.65], [0.9, 1]);
+  const buttonY = useTransform(smoothProgress, [0.5, 0.65], [15, 0]);
+  const buttonPointerEvents = useTransform(smoothProgress, (val) =>
+    val >= 0.58 ? "auto" : "none"
+  );
+
   return (
     <section
       ref={sectionRef}
@@ -311,91 +266,75 @@ export const Projects = ({ onViewAllClick }) => {
       aria-label="Projects section"
       className="
         relative z-10
-        bg-[#0C0C0C]
+        bg-transparent
         -mt-10 sm:-mt-12 md:-mt-14
         rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px]
-        px-4 sm:px-8 md:px-10
-        pt-16 sm:pt-20 md:pt-28
-        pb-24 sm:pb-28 md:pb-36
-        overflow-hidden
+        px-5 sm:px-8 md:px-10
+        py-20 sm:py-24 md:py-32
+        overflow-visible
       "
+      style={{ height: "180vh" }}
     >
-      {/* Scroll progress bar */}
-      <ScrollProgressBar scrollYProgress={sectionProgress} />
-
-      {/* Subtle radial glow top-center */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-[400px]"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 40% at 50% 0%, rgba(99,102,241,0.08) 0%, transparent 70%)",
-        }}
-      />
-
-      {/* ── SECTION HEADING (Sticky) ── */}
-      <div
-        className="sticky top-[70px] sm:top-[90px] md:top-[100px] text-center mb-14 sm:mb-18 md:mb-20 z-20 py-2"
-      >
-        <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.3em] text-[#D7E2EA]/40 mb-2 font-sans">
-          Selected Work
-        </p>
+      {/* ── SECTION HEADING (Outside the sticky wrapper to scroll away) ── */}
+      <div className="text-center mb-8 sm:mb-12 flex flex-col items-center">
         <h2
-          className="font-black uppercase tracking-tighter leading-none font-sans"
-          style={{
-            fontSize: "clamp(3.5rem, 13vw, 140px)",
-            background: "linear-gradient(180deg, #646973 0%, #BBCCD7 55%, #6E7A85 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
-          }}
+          className="font-space font-bold text-4xl sm:text-5xl md:text-6xl text-text-primary tracking-tight leading-tight bg-gradient-to-r from-accent to-accent-alt bg-clip-text text-transparent"
         >
-          Projects
+          Project
         </h2>
       </div>
 
-      {/* ── STICKY CARDS STACK ── */}
-      <div 
-        ref={containerRef}
-        className="relative max-w-[1100px] mx-auto"
-        style={{ height: "350vh" }}
+      <div
+        className="
+          sticky top-[60px] md:top-[80px]
+          h-[83vh] sm:h-[84vh] md:h-[85vh] w-full max-w-[1100px] mx-auto
+          overflow-visible
+        "
       >
-        {PROJECT_DATA.map((project, index) => (
-          <ProjectCard
-            key={project.id}
-            project={project}
-            index={index}
-            totalCards={PROJECT_DATA.length}
-            scrollYProgress={scrollYProgress}
-            prefersReducedMotion={prefersReducedMotion}
-          />
-        ))}
-      </div>
+        {/* ── STICKY CARDS CONTAINER (Overflow visible to prevent clipping) ── */}
+        <div className="relative w-full h-[70vh] sm:h-[72vh] md:h-[74vh] overflow-visible">
+          {PROJECT_DATA.map((project, index) => (
+            <ProjectCard
+              key={project.id}
+              project={project}
+              index={index}
+              smoothProgress={smoothProgress}
+              prefersReducedMotion={prefersReducedMotion}
+            />
+          ))}
+        </div>
 
-      {/* ── VIEW ALL BUTTON ── */}
-      <div className="mt-16 sm:mt-20 text-center relative z-10 font-sans">
-        <button
-          onClick={onViewAllClick}
-          aria-label="View all projects"
-          className="
-            group inline-flex items-center gap-3
-            px-7 py-3.5 sm:px-9 sm:py-4
-            rounded-full
-            border border-[#D7E2EA]/25
-            bg-[#D7E2EA]/5
-            text-[#D7E2EA]/70
-            text-sm sm:text-base font-semibold uppercase tracking-widest
-            hover:bg-[#D7E2EA]/12 hover:border-[#D7E2EA]/50 hover:text-[#D7E2EA]
-            hover:shadow-[0_0_28px_rgba(215,226,234,0.15)]
-            transition-all duration-300
-          "
+        {/* ── VIEW ALL BUTTON (Positioned absolutely at the bottom of the sticky wrapper) ── */}
+        <motion.div
+          style={{
+            opacity: buttonOpacity,
+            scale: buttonScale,
+            y: buttonY,
+            pointerEvents: buttonPointerEvents,
+          }}
+          className="absolute bottom-2 left-0 right-0 flex justify-center z-30 pointer-events-none"
         >
-          View All Projects
-          <ArrowUpRight
-            size={16}
-            className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300"
-          />
-        </button>
+          <button
+            onClick={onViewAllClick}
+            aria-label="View all projects"
+            className="
+              px-8 py-3.5 sm:px-10 sm:py-4
+              text-sm sm:text-base font-bold uppercase tracking-widest
+              border-2 border-[#D7E2EA]
+              bg-[#0C0C0C]
+              text-[#D7E2EA]
+              rounded-full
+              hover:bg-[#D7E2EA]/10
+              transition-all duration-300
+              cursor-pointer
+              font-sans
+              pointer-events-auto
+              shadow-[0_4px_20px_rgba(0,0,0,0.4)]
+            "
+          >
+            View All Projects
+          </button>
+        </motion.div>
       </div>
     </section>
   );
