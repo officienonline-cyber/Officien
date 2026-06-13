@@ -12,7 +12,7 @@ import { Contact } from "./sections/Contact";
 import { Footer } from "./components/Footer";
 import { useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 
-const TOTAL_FRAMES = 195;
+const TOTAL_FRAMES = 700;
 
 function App() {
   const canvasRef = useRef(null);
@@ -25,9 +25,9 @@ function App() {
 
   // Track global window scroll position
   const { scrollY } = useScroll();
-  
-  // Animate the image frames over the first 1000px of scroll
-  const frameIndex = useTransform(scrollY, [0, 1000], [0, TOTAL_FRAMES - 1]);
+
+  // Animate the image frames over the first 4500px of scroll
+  const frameIndex = useTransform(scrollY, [0, 4500], [0, TOTAL_FRAMES - 1]);
 
   const drawFrame = (index) => {
     const canvas = canvasRef.current;
@@ -36,19 +36,19 @@ function App() {
     const img = imagesRef.current[index];
     if (img && img.complete) {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       const w = canvas.width;
       const h = canvas.height;
       const iw = img.naturalWidth || img.width;
       const ih = img.naturalHeight || img.height;
       const r = Math.max(w / iw, h / ih);
-      
+
       let nw = iw * r;
       let nh = ih * r;
-      
+
       const x = (w - nw) / 2;
       const y = (h - nh) / 2;
-      
+
       ctx.drawImage(img, x, y, nw, nh);
     }
   };
@@ -57,12 +57,12 @@ function App() {
   useEffect(() => {
     const loadedImages = [];
     let loadedCount = 0;
-    
+
     for (let i = 1; i <= TOTAL_FRAMES; i++) {
       const img = new Image();
       const frameNum = String(i).padStart(3, "0");
       img.src = `/hero-animation/ezgif-frame-${frameNum}.jpg`;
-      
+
       img.onload = () => {
         loadedCount++;
         if (i - 1 === currentFrameIndexRef.current) {
@@ -72,7 +72,7 @@ function App() {
           setImagesLoaded(true);
         }
       };
-      
+
       loadedImages.push(img);
     }
     imagesRef.current = loadedImages;
