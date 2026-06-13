@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { motion, useScroll, useSpring } from "framer-motion";
 import { ArrowLeft, Clock } from "lucide-react";
 import { Button } from "../components/ui/Button";

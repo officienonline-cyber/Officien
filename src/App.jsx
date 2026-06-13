@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { Header } from "./components/Header";
 import { Hero } from "./sections/Hero";
 import { Services } from "./sections/Services";
@@ -18,7 +18,7 @@ function App() {
   const canvasRef = useRef(null);
   const imagesRef = useRef([]);
   const currentFrameIndexRef = useRef(0);
-  const [imagesLoaded, setImagesLoaded] = useState(false);
+
   const [activePost, setActivePost] = useState(null);
   const [showAllBlogs, setShowAllBlogs] = useState(false);
   const [showAllProjects, setShowAllProjects] = useState(false);
@@ -56,7 +56,7 @@ function App() {
   // Preload images
   useEffect(() => {
     const loadedImages = [];
-    let loadedCount = 0;
+
 
     for (let i = 1; i <= TOTAL_FRAMES; i++) {
       const img = new Image();
@@ -64,13 +64,11 @@ function App() {
       img.src = `/hero-animation/ezgif-frame-${frameNum}.jpg`;
 
       img.onload = () => {
-        loadedCount++;
+
         if (i - 1 === currentFrameIndexRef.current) {
           drawFrame(i - 1);
         }
-        if (loadedCount === TOTAL_FRAMES) {
-          setImagesLoaded(true);
-        }
+
       };
 
       loadedImages.push(img);

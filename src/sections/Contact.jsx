@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Mail, Check, Copy, MessageSquare, MapPin, Send, Loader2 } from "lucide-react";
 import confetti from "canvas-confetti";
 import { GlassCard } from "../components/ui/GlassCard";

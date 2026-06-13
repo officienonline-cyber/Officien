@@ -1,31 +1,15 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { CheckCircle2, Code2, TrendingUp, Star } from "lucide-react";
 import { GlassCard } from "../components/ui/GlassCard";
 
-const handleLinkClick = (e, href) => {
-  e.preventDefault();
-  const element = document.querySelector(href);
-  if (element) {
-    const offset = 80;
-    const bodyRect = document.body.getBoundingClientRect().top;
-    const elementRect = element.getBoundingClientRect().top;
-    const elementPosition = elementRect - bodyRect;
-    const offsetPosition = elementPosition - offset;
-
-    window.scrollTo({
-      top: offsetPosition,
-      behavior: "smooth",
-    });
-  }
-};
-
 export const Hero = () => {
   const { scrollY } = useScroll();
-  const [windowHeight, setWindowHeight] = React.useState(800);
+  const [windowHeight, setWindowHeight] = useState(() =>
+    typeof window !== "undefined" ? window.innerHeight : 800
+  );
 
-  React.useEffect(() => {
-    setWindowHeight(window.innerHeight);
+  useEffect(() => {
     const handleResize = () => setWindowHeight(window.innerHeight);
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);

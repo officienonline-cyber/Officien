@@ -1,9 +1,8 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { Code2, Palette, Bot, TrendingUp, Layers, Workflow, ArrowRight } from "lucide-react";
 import { Badge } from "../components/ui/Badge";
 import { GlassCard } from "../components/ui/GlassCard";
-import { Button } from "../components/ui/Button";
 
 const services = [
   {
@@ -222,14 +221,6 @@ export const Services = () => {
               <p className="font-sans text-[15px] sm:text-[16px] text-text-secondary leading-relaxed">
                 Every engagement starts with understanding your goals. We work in tight sprint cycles with full transparency, bridging engineering excellence and design mastery.
               </p>
-              <div className="mt-2">
-                <a href="#contact">
-                  <Button size="md" className="group">
-                    Explore Custom Builds
-                    <ArrowRight size={15} className="ml-2 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </a>
-              </div>
             </motion.div>
 
           </div>

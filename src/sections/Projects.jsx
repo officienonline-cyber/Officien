@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, memo } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 
 /* ─────────────────────────────────────────────
@@ -68,7 +68,7 @@ const LiveProjectButton = ({ projectName }) => (
 /* ─────────────────────────────────────────────
    SINGLE PROJECT CARD
 ───────────────────────────────────────────── */
-const ProjectCard = React.memo(({ project, index, smoothProgress, prefersReducedMotion }) => {
+const ProjectCard = memo(({ project, index, smoothProgress, prefersReducedMotion }) => {
   const totalCards = PROJECT_DATA.length;
   const targetScale = 1 - (totalCards - 1 - index) * 0.03;
 
@@ -241,11 +241,13 @@ export const Projects = ({ onViewAllClick }) => {
     mass: 0.5,
   });
 
-  // Prefers-reduced-motion check
-  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(() =>
+    typeof window !== "undefined"
+      ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      : false
+  );
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReducedMotion(mq.matches);
     const handler = (e) => setPrefersReducedMotion(e.matches);
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
