@@ -105,7 +105,7 @@ export const About = () => {
                   <span>The Collective</span>
                 </div>
                 <h4 className="font-space text-lg font-bold text-text-primary mb-1">
-                  Ahmedabad Core Team
+                  Core Team
                 </h4>
                 <p className="font-sans text-[13px] text-text-secondary max-w-[340px]">
                   Bridging engineering excellence and visual mastery, operating globally in hybrid sprint structures.

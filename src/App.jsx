@@ -190,10 +190,7 @@ function App() {
       {activePost ? (
         <BlogPostDetail post={activePost} onBack={handleBackFromDetail} />
       ) : showAllBlogs ? (
-        <>
-          <BlogArticlesPage onSelectPost={setActivePost} onBack={handleBackFromAllBlogs} />
-          <Footer />
-        </>
+        <BlogArticlesPage onSelectPost={setActivePost} onBack={handleBackFromAllBlogs} />
       ) : showAllProjects ? (
         <ProjectsPage onBack={handleBackFromAllProjects} />
       ) : (
